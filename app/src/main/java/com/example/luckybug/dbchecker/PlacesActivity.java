@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.provider.Contacts;
+import android.util.JsonWriter;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +29,10 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
+import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -36,6 +41,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -50,22 +56,29 @@ public class PlacesActivity extends ListActivity implements
     LocationClient mLocationClient;
 
     ArrayAdapter<Model> adapter;
-    ArrayList<Model> list = null;
+    PlacesList placesList = new PlacesList();
 
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+
         // create an array of Strings, that will be put to our ListActivity
         try{
-            FileInputStream fis = openFileInput("DBChekerList");
-            ObjectInputStream is = new ObjectInputStream(fis);
-            list = (ArrayList<Model>) is.readObject();
-            is.close();
+            SharedPreferences settings = getSharedPreferences("list.json", 0);
+
+            Gson gson = new Gson();
+
+            String listStr = settings.getString("list", "");
+
+            placesList = gson.fromJson(listStr, placesList.getClass());
+
+            Toast.makeText(this, "all good", Toast.LENGTH_LONG).show();
         }catch (Exception e) {
-            list = new ArrayList<Model>();
+            placesList.list = new ArrayList<Model>();
+            Toast.makeText(this, "Error while reading " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
         adapter = new InteractivePlaceArrayAdapter(this,
-                list);
+                placesList.list);
         setListAdapter(adapter);
 
         mLocationClient = new LocationClient(this, this, this);
@@ -84,14 +97,20 @@ public class PlacesActivity extends ListActivity implements
         super.onStop();
     }
     @Override
-    public void onBackPressed() {
+    public void onBackPressed()
+    {
         try{
-            FileOutputStream fos = openFileOutput("DBChekerList", Context.MODE_PRIVATE);
-            ObjectOutputStream os = new ObjectOutputStream(fos);
-            os.writeObject(list);
-            os.close();
-        }catch (Exception e) {
+            Gson gson = new Gson();
 
+            SharedPreferences settings = getSharedPreferences("list.json", 0);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("list",  gson.toJson(placesList));
+
+            // Commit the edits!
+            editor.apply();
+
+        }catch (Exception e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
         super.onBackPressed();
     }
@@ -168,7 +187,7 @@ public class PlacesActivity extends ListActivity implements
                     // Получили значение введенных данных!
 
                     Location currentLocation = mLocationClient.getLastLocation();
-                    list.add(new Model(value, currentLocation));
+                    placesList.list.add(new Model(value, currentLocation));
                     adapter.notifyDataSetChanged();
                 }
             });
