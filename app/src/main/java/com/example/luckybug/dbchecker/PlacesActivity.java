@@ -117,7 +117,8 @@ public class PlacesActivity extends ListActivity implements
 
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
-                Model item = (Model) getListAdapter().getItem(0);
+                int itemNumber = data.getIntExtra("itemNumber", 0);
+                Model item = (Model) getListAdapter().getItem(itemNumber);
                 item.setList((ArrayList<GoodModel>) data.getSerializableExtra("goodsList"));
             }
         }
@@ -135,6 +136,7 @@ public class PlacesActivity extends ListActivity implements
         if( distance < eps ) {
             Intent intent = new Intent(getBaseContext(), GoodsActivity.class);
             intent.putExtra("goodsList", item.getList());
+            intent.putExtra("itemNumber", position);
             startActivityForResult(intent, 0);
             //startActivity(intent);
         }

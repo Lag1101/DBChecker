@@ -40,6 +40,7 @@ public class GoodsActivity extends ListActivity {
     @Override
     public void onBackPressed() {
         Intent intent = new Intent();
+        intent.putExtra("itemNumber", getIntent().getIntExtra("itemNumber", 0));
         intent.putExtra("goodsList", list);
         setResult(RESULT_OK, intent);
         super.onBackPressed();
