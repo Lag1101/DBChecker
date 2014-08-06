@@ -81,6 +81,21 @@ public class PlacesActivity extends ListActivity implements
                 placesList.list);
         setListAdapter(adapter);
 
+        ListView list = getListView();
+        list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                           int position, long id) {
+                Toast.makeText(PlacesActivity.this,
+                        "Item in position " + position + " long clicked",
+                        Toast.LENGTH_LONG).show();
+                // Возвращает "истину", чтобы завершить событие клика, чтобы
+                // onListItemClick больше не вызывался
+                return true;
+            }
+        });
+
         mLocationClient = new LocationClient(this, this, this);
     }
 
