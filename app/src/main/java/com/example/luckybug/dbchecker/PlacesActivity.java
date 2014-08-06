@@ -31,6 +31,13 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
 import com.google.gson.Gson;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -157,38 +164,80 @@ public class PlacesActivity extends ListActivity implements
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.places_settings) {
-            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        switch(id) {
+            case R.id.places_settings:
+            {
+                AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-            alert.setTitle("New place");
-            alert.setMessage("Type name of new place");
-            // Добавим поле ввода
-            final EditText input = new EditText(this);
-            alert.setView(input);
+                alert.setTitle("New place");
+                alert.setMessage("Type name of new place");
+                // Добавим поле ввода
+                final EditText input = new EditText(this);
+                alert.setView(input);
 
-            alert.setPositiveButton("ОК", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    String value = input.getText().toString();
-                    // Получили значение введенных данных!
+                alert.setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String value = input.getText().toString();
+                        // Получили значение введенных данных!
 
-                    Location currentLocation = mLocationClient.getLastLocation();
-                    placesList.list.add(new Model(value, currentLocation));
-                    adapter.notifyDataSetChanged();
+                        Location currentLocation = mLocationClient.getLastLocation();
+                        placesList.list.add(new Model(value, currentLocation));
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+
+                alert.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Если отменили.
+                    }
+                });
+
+                alert.show();
+
+
+                return true;
+            }
+            case R.id.send_to_server:
+            {
+                final List<NameValuePair> places = new ArrayList<NameValuePair>();
+
+                for( Model place : placesList.list) {
+                    List<NameValuePair> goods = new ArrayList<NameValuePair>();
+                    for( GoodModel good : place.getList()) {
+                        goods.add(new BasicNameValuePair(good.getDescription(), Boolean.toString(good.isSelected())));
+                    }
+                    places.add(new BasicNameValuePair(place.getName(), goods.toString()));
                 }
-            });
+                Thread thread = new Thread(new Runnable(){
+                    @Override
+                    public void run() {
+                        try {
+                            HttpClient httpclient = new DefaultHttpClient();
+                            HttpPost httppost = new HttpPost("http://192.168.1.101:3000/");
 
-            alert.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // Если отменили.
-                }
-            });
+                            try {
+                                // Добавим данные (пара - "название - значение")
+                                httppost.setEntity(new UrlEncodedFormEntity(places, "UTF-8"));
+                                // Выполним запрос
+                                HttpResponse response = httpclient.execute(httppost);
 
-            alert.show();
+                            } catch (Exception e) {
+                                //txtView.setText(e.getMessage());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                thread.start();
 
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
 
-            return true;
         }
-        return super.onOptionsItemSelected(item);
+
     }
 
     void loadData() {

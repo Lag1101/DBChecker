@@ -4,5 +4,9 @@
     <item android:id="@+id/places_settings"
         android:title="New place"
         android:orderInCategory="100"
-        android:showAsAction="always" />
+        android:showAsAction="collapseActionView" />
+    <item android:id="@+id/send_to_server"
+        android:title="Send"
+        android:orderInCategory="100"
+        android:showAsAction="collapseActionView" />
 </menu>
