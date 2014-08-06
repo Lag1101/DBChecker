@@ -58,6 +58,7 @@ public class PlacesActivity extends ListActivity implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener{
 
+
     static final float eps = 150;
 
     LocationClient mLocationClient;
@@ -232,6 +233,11 @@ public class PlacesActivity extends ListActivity implements
                 thread.start();
 
                 return true;
+            }
+            case R.id.clear:
+            {
+                placesList.list.clear();
+                adapter.notifyDataSetChanged();
             }
             default:
                 return super.onOptionsItemSelected(item);
