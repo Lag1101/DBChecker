@@ -62,20 +62,7 @@ public class PlacesActivity extends ListActivity implements
         super.onCreate(icicle);
 
         // create an array of Strings, that will be put to our ListActivity
-        try{
-            SharedPreferences settings = getSharedPreferences("list.json", 0);
-
-            Gson gson = new Gson();
-
-            String listStr = settings.getString("list", "");
-
-            placesList = gson.fromJson(listStr, placesList.getClass());
-
-            Toast.makeText(this, "all good", Toast.LENGTH_LONG).show();
-        }catch (Exception e) {
-            placesList.list = new ArrayList<Model>();
-            Toast.makeText(this, "Error while reading " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
+        loadData();
 
         adapter = new InteractivePlaceArrayAdapter(this,
                 placesList.list);
@@ -109,25 +96,8 @@ public class PlacesActivity extends ListActivity implements
     protected void onStop() {
         // Disconnecting the client invalidates it.
         mLocationClient.disconnect();
+        saveData();
         super.onStop();
-    }
-    @Override
-    public void onBackPressed()
-    {
-        try{
-            Gson gson = new Gson();
-
-            SharedPreferences settings = getSharedPreferences("list.json", 0);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putString("list",  gson.toJson(placesList));
-
-            // Commit the edits!
-            editor.apply();
-
-        }catch (Exception e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-        super.onBackPressed();
     }
     @Override
     public void onConnected(Bundle dataBundle) {
@@ -219,5 +189,43 @@ public class PlacesActivity extends ListActivity implements
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    void loadData() {
+        try{
+            SharedPreferences settings = getSharedPreferences("list.json", 0);
+
+            Gson gson = new Gson();
+
+            String listStr = settings.getString("list", "");
+
+            if( listStr.isEmpty() )
+            {
+                throw new Exception("There isn't any data");
+            }
+
+            placesList = gson.fromJson(listStr, placesList.getClass());
+
+            Toast.makeText(this, "Successfully loaded", Toast.LENGTH_LONG).show();
+        }catch (Exception e) {
+            placesList.list = new ArrayList<Model>();
+            Toast.makeText(this, "Error while reading " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+    void saveData() {
+        try{
+            Gson gson = new Gson();
+
+            SharedPreferences settings = getSharedPreferences("list.json", 0);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString("list",  gson.toJson(placesList));
+
+            // Commit the edits!
+            editor.apply();
+            Toast.makeText(this, "Successfully saved", Toast.LENGTH_LONG).show();
+
+        }catch (Exception e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 }
