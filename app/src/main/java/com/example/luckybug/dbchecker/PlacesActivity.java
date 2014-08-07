@@ -151,10 +151,16 @@ public class PlacesActivity extends ListActivity implements
             //startActivity(intent);
         } else {
             // 1. Instantiate an AlertDialog.Builder with its constructor
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Вы слишком далеко")
-                    .setTitle("Предупреждение");
-            AlertDialog dialog = builder.create();
+            new AlertDialog.Builder(this)
+                .setMessage("Вы слишком далеко")
+                .setTitle("Предупреждение")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface i, int which) {
+
+                    }
+                })
+                .show();
         }
     }
     @Override
@@ -199,42 +205,6 @@ public class PlacesActivity extends ListActivity implements
 
                 alert.show();
 
-
-                return true;
-            }
-            case R.id.send_to_server:
-            {
-                final List<NameValuePair> places = new ArrayList<NameValuePair>();
-
-                for( Model place : placesList.list) {
-                    List<NameValuePair> goods = new ArrayList<NameValuePair>();
-                    for( GoodModel good : place.getList()) {
-                        goods.add(new BasicNameValuePair(good.getDescription(), good.getCheck()));
-                    }
-                    places.add(new BasicNameValuePair(place.getName(), goods.toString()));
-                }
-                Thread thread = new Thread(new Runnable(){
-                    @Override
-                    public void run() {
-                        try {
-                            HttpClient httpclient = new DefaultHttpClient();
-                            HttpPost httppost = new HttpPost("http://192.168.1.101:3000/");
-
-                            try {
-                                // Добавим данные (пара - "название - значение")
-                                httppost.setEntity(new UrlEncodedFormEntity(places, "UTF-8"));
-                                // Выполним запрос
-                                HttpResponse response = httpclient.execute(httppost);
-
-                            } catch (Exception e) {
-                                //txtView.setText(e.getMessage());
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                thread.start();
 
                 return true;
             }
