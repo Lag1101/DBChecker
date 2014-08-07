@@ -45,7 +45,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,11 +71,7 @@ public class PlacesActivity extends ListActivity implements
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
-        // create an array of Strings, that will be put to our ListActivity
-        loadData();
-
-        adapter = new InteractivePlaceArrayAdapter(this,
-                placesList.list);
+        adapter = new InteractivePlaceArrayAdapter(this, placesList.list, R.layout.placeitem);
         setListAdapter(adapter);
 
         ListView list = getListView();
@@ -104,7 +102,6 @@ public class PlacesActivity extends ListActivity implements
     protected void onStop() {
         // Disconnecting the client invalidates it.
         mLocationClient.disconnect();
-        saveData();
         super.onStop();
     }
     @Override
@@ -131,7 +128,8 @@ public class PlacesActivity extends ListActivity implements
             if (resultCode == RESULT_OK) {
                 int itemNumber = data.getIntExtra("itemNumber", 0);
                 Model item = (Model) getListAdapter().getItem(itemNumber);
-                item.setList((ArrayList<GoodModel>) data.getSerializableExtra("goodsList"));
+                ArrayList<GoodModel> list =  (ArrayList<GoodModel>) data.getSerializableExtra("goodsList");
+                saveData(item, list);
             }
         }
     }
@@ -246,39 +244,43 @@ public class PlacesActivity extends ListActivity implements
 
     }
 
-    void loadData() {
+    void saveData(Model item, ArrayList<GoodModel> list) {
         try{
-            SharedPreferences settings = getSharedPreferences("list.json", 0);
-
             Gson gson = new Gson();
-
-            String listStr = settings.getString("list", "");
-
-            if( listStr.isEmpty() )
+            StringList listOfLists = null;
+            SharedPreferences settings = getSharedPreferences("settings", 0);
+            SharedPreferences.Editor editor = settings.edit();
+            //load
+            try
             {
-                throw new Exception("There isn't any data");
+                String listStr = settings.getString("listOfLists.json", "");
+                if( listStr.isEmpty() )
+                {
+                    throw new Exception("There isn't any data");
+                }
+                listOfLists = gson.fromJson(listStr, StringList.class);
+            } catch (Exception e) {
+                listOfLists = new StringList();
+            }
+            //save
+            {
+                String settingName = item.getName() +" : " + DateFormat.getDateTimeInstance().format(new Date());
+
+                listOfLists.list.add( settingName );
+
+                editor.putString("listOfLists.json",  gson.toJson(listOfLists));
+
+                Model newItem = new Model(settingName, item.getLocation());
+                newItem.list = list;
+
+                editor.putString(settingName, gson.toJson(newItem));
+
+                // Commit the edits!
+                editor.apply();
+                Toast.makeText(this, "Successfully saved", Toast.LENGTH_LONG).show();
             }
 
-            placesList = gson.fromJson(listStr, placesList.getClass());
 
-            Toast.makeText(this, "Successfully loaded", Toast.LENGTH_LONG).show();
-        }catch (Exception e) {
-            placesList = new PlacesList();
-            Toast.makeText(this, "Error while reading " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-        //placesList = new PlacesList();
-    }
-    void saveData() {
-        try{
-            Gson gson = new Gson();
-
-            SharedPreferences settings = getSharedPreferences("list.json", 0);
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putString("list",  gson.toJson(placesList));
-
-            // Commit the edits!
-            editor.apply();
-            Toast.makeText(this, "Successfully saved", Toast.LENGTH_LONG).show();
 
         }catch (Exception e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();

@@ -14,8 +14,8 @@ public class InteractivePlaceArrayAdapter extends ArrayAdapter<Model> {
     private final List<Model> list;
     private final Activity context;
 
-    public InteractivePlaceArrayAdapter(Activity context, List<Model> list) {
-        super(context, R.layout.gooditem, list);
+    public InteractivePlaceArrayAdapter(Activity context, List<Model> list, int layout) {
+        super(context, layout, list);
         this.context = context;
         this.list = list;
     }
