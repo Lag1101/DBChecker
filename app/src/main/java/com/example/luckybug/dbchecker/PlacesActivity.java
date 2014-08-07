@@ -149,6 +149,12 @@ public class PlacesActivity extends ListActivity implements
             intent.putExtra("itemNumber", position);
             startActivityForResult(intent, 0);
             //startActivity(intent);
+        } else {
+            // 1. Instantiate an AlertDialog.Builder with its constructor
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Вы слишком далеко")
+                    .setTitle("Предупреждение");
+            AlertDialog dialog = builder.create();
         }
     }
     @Override
@@ -203,7 +209,7 @@ public class PlacesActivity extends ListActivity implements
                 for( Model place : placesList.list) {
                     List<NameValuePair> goods = new ArrayList<NameValuePair>();
                     for( GoodModel good : place.getList()) {
-                        goods.add(new BasicNameValuePair(good.getDescription(), getResources().getStringArray(R.array.good_check)[good.isSelected()]));
+                        goods.add(new BasicNameValuePair(good.getDescription(), good.getCheck()));
                     }
                     places.add(new BasicNameValuePair(place.getName(), goods.toString()));
                 }

@@ -26,7 +26,7 @@ public class InteractiveArrayAdapter extends ArrayAdapter<GoodModel> {
 
     static class ViewHolder {
         protected TextView text;
-        protected Spinner spinner;
+        protected TextView check;
     }
 
     @Override
@@ -37,34 +37,17 @@ public class InteractiveArrayAdapter extends ArrayAdapter<GoodModel> {
             view = inflator.inflate(R.layout.gooditem, null);
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.text = (TextView) view.findViewById(R.id.label);
-            viewHolder.spinner = (Spinner) view.findViewById(R.id.spinner);
+            viewHolder.check = (TextView) view.findViewById(R.id.check);
 
-            viewHolder.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view,
-                                           int pos, long id) {
-                    // An item was selected. You can retrieve the selected item using
-                    // parent.getItemAtPosition(pos)
-                    GoodModel element = (GoodModel) viewHolder.spinner.getTag();
-                    String strChoose = viewHolder.spinner.getSelectedItem().toString();
-                    Toast.makeText(getContext(), strChoose, Toast.LENGTH_SHORT).show();
-                    element.setSelected(pos);
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                    // Another interface callback
-                }
-            });
             view.setTag(viewHolder);
-            viewHolder.spinner.setTag(list.get(position));
+            viewHolder.check.setTag(list.get(position));
         } else {
             view = convertView;
-            ((ViewHolder) view.getTag()).spinner.setTag(list.get(position));
+            ((ViewHolder) view.getTag()).check.setTag(list.get(position));
         }
         ViewHolder holder = (ViewHolder) view.getTag();
         holder.text.setText(list.get(position).getDescription());
-        holder.spinner.setSelection(list.get(position).isSelected());
+        holder.check.setText(list.get(position).getCheck());
         return view;
     }
 }

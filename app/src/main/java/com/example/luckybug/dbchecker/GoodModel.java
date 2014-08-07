@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class GoodModel implements Serializable {
 
     private String description;
-    private int selected;
+    private String check;
 
     public static ArrayList<GoodModel> defaultGoods = new ArrayList<GoodModel>(Arrays.asList(
             new GoodModel("Светов. короб светится, без повреж, чист."),
@@ -24,7 +24,7 @@ public class GoodModel implements Serializable {
 
     public GoodModel(String description) {
         this.description = description;
-        selected = 0;
+        check = "";
     }
 
     public String getDescription() {
@@ -35,12 +35,12 @@ public class GoodModel implements Serializable {
         this.description = description;
     }
 
-    public int isSelected() {
-        return selected;
+    public String getCheck() {
+        return check;
     }
 
-    public void setSelected(int selected) {
-        this.selected = selected;
+    public void setCheck(String check) {
+        this.check = check;
     }
 
 }

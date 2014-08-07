@@ -1,6 +1,7 @@
 package com.example.luckybug.dbchecker;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -80,11 +81,25 @@ public class GoodsActivity extends ListActivity {
             Toast.makeText(this, "Took", Toast.LENGTH_SHORT).show();
         }
     }
+
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        Model item = (Model) getListAdapter().getItem(position);
+        final GoodModel item = (GoodModel) getListAdapter().getItem(position);
 
-        Toast.makeText(this, item.getName() , Toast.LENGTH_LONG).show();
+        new AlertDialog.Builder(this)
+                .setTitle("Выберите действие")
+                .setItems(R.array.good_check, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // The 'which' argument contains the index position
+                        // of the selected item
+                        item.setCheck(getResources().getStringArray(R.array.good_check)[which]);
+                        adapter.notifyDataSetChanged();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show();
+
+        Toast.makeText(this, item.getDescription() , Toast.LENGTH_LONG).show();
     }
     @Override
     public void onBackPressed() {

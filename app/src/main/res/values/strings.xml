@@ -10,7 +10,6 @@
     <string name="not_checked">Не отмечено</string>
 
     <string-array name="good_check">
-        <item>@string/not_checked</item>
         <item>@string/exist</item>
         <item>@string/not_exist</item>
     </string-array>
