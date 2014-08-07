@@ -1,12 +1,10 @@
 package com.example.luckybug.dbchecker;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.location.Location;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -15,16 +13,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.location.LocationClient;
-
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by LuckyBug on 06.08.2014.
@@ -76,7 +68,7 @@ public class GoodsActivity extends ListActivity {
         return super.onContextItemSelected(item);
     }
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAMERA_PIC_REQUEST) {
+        if (requestCode == CAMERA_PIC_REQUEST && requestCode == RESULT_OK) {
             Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
             Toast.makeText(this, "Took", Toast.LENGTH_SHORT).show();
         }
@@ -97,17 +89,37 @@ public class GoodsActivity extends ListActivity {
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_info)
+                .create()
                 .show();
 
         Toast.makeText(this, item.getDescription() , Toast.LENGTH_LONG).show();
     }
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent();
-        intent.putExtra("itemNumber", getIntent().getIntExtra("itemNumber", 0));
-        intent.putExtra("goodsList", list);
-        setResult(RESULT_OK, intent);
-        super.onBackPressed();
+        new AlertDialog.Builder(this)
+                //.setTitle("")
+                .setMessage("Сохранить изменения?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = new Intent();
+                        intent.putExtra("itemNumber", getIntent().getIntExtra("itemNumber", 0));
+                        intent.putExtra("goodsList", list);
+                        setResult(RESULT_OK, intent);
+                        GoodsActivity.super.onBackPressed();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = new Intent();
+                        setResult(RESULT_CANCELED, intent);
+                        GoodsActivity.super.onBackPressed();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .create()
+                .show();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

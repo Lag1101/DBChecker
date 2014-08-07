@@ -1,10 +1,8 @@
 package com.example.luckybug.dbchecker;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,7 +11,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.luckybug.dbchecker.R;
 import com.google.gson.Gson;
 
 import org.apache.http.HttpResponse;
@@ -105,6 +102,20 @@ public class HistoryList extends ListActivity {
 
                 return true;
             }
+            case R.id.clear:
+            {
+
+                SharedPreferences settings = getSharedPreferences("settings", 0);
+                SharedPreferences.Editor editor = settings.edit();
+                for( Model model : placesList.list ) {
+                    editor.remove(model.getName());
+                }
+                editor.remove("listOfLists.json");
+                editor.commit();
+
+                placesList.list.clear();
+                adapter.notifyDataSetChanged();
+            }
             default:return super.onOptionsItemSelected(item);
         }
     }
@@ -115,7 +126,6 @@ public class HistoryList extends ListActivity {
             Gson gson = new Gson();
             StringList listOfLists = null;
             SharedPreferences settings = getSharedPreferences("settings", 0);
-            SharedPreferences.Editor editor = settings.edit();
             //load
             try
             {

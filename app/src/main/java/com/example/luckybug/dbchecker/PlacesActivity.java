@@ -1,29 +1,19 @@
 package com.example.luckybug.dbchecker;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.provider.Contacts;
-import android.util.JsonWriter;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -31,27 +21,9 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
 import com.google.gson.Gson;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Created by vasiliy.lomanov on 05.08.2014.
@@ -61,7 +33,7 @@ public class PlacesActivity extends ListActivity implements
         GooglePlayServicesClient.OnConnectionFailedListener{
 
 
-    static final float eps = 150;
+    static final float eps = 1500;
 
     LocationClient mLocationClient;
 
@@ -207,11 +179,6 @@ public class PlacesActivity extends ListActivity implements
 
 
                 return true;
-            }
-            case R.id.clear:
-            {
-                placesList.list.clear();
-                adapter.notifyDataSetChanged();
             }
             default:
                 return super.onOptionsItemSelected(item);

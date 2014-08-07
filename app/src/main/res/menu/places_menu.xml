@@ -5,8 +5,4 @@
         android:title="New place"
         android:orderInCategory="100"
         android:showAsAction="collapseActionView" />
-    <item android:id="@+id/clear"
-        android:title="Clear"
-        android:orderInCategory="100"
-        android:showAsAction="collapseActionView" />
 </menu>
