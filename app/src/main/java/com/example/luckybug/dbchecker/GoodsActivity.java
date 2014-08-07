@@ -81,6 +81,12 @@ public class GoodsActivity extends ListActivity {
         }
     }
     @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Model item = (Model) getListAdapter().getItem(position);
+
+        Toast.makeText(this, item.getName() , Toast.LENGTH_LONG).show();
+    }
+    @Override
     public void onBackPressed() {
         Intent intent = new Intent();
         intent.putExtra("itemNumber", getIntent().getIntExtra("itemNumber", 0));
