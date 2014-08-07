@@ -263,9 +263,10 @@ public class PlacesActivity extends ListActivity implements
 
             Toast.makeText(this, "Successfully loaded", Toast.LENGTH_LONG).show();
         }catch (Exception e) {
-            placesList.list = new ArrayList<Model>();
+            placesList = new PlacesList();
             Toast.makeText(this, "Error while reading " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
+        //placesList = new PlacesList();
     }
     void saveData() {
         try{

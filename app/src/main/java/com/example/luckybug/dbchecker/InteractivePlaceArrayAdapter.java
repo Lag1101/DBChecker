@@ -22,7 +22,6 @@ public class InteractivePlaceArrayAdapter extends ArrayAdapter<Model> {
 
     static class ViewHolder {
         protected TextView text;
-        protected TextView location;
     }
 
     @Override
@@ -33,14 +32,12 @@ public class InteractivePlaceArrayAdapter extends ArrayAdapter<Model> {
             view = inflator.inflate(R.layout.placeitem, null);
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.text = (TextView) view.findViewById(R.id.label);
-            viewHolder.location = (TextView) view.findViewById(R.id.location);
             view.setTag(viewHolder);
         } else {
             view = convertView;
         }
         ViewHolder holder = (ViewHolder) view.getTag();
         holder.text.setText(list.get(position).getName());
-        holder.location.setText(list.get(position).getLocation().toString());
         return view;
     }
 }
