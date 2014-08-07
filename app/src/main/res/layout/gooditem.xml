@@ -5,23 +5,27 @@
 
     <TextView
         android:id="@+id/label"
-        android:layout_width="wrap_content"
+        android:layout_width="200sp"
         android:layout_height="wrap_content"
-        android:text="@+id/label"
+        android:text="empty"
         android:textSize="20sp"
-        android:layout_alignParentTop="true"
+        android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:gravity="center|left">
     </TextView>
 
-
-    <CheckBox
-        android:id="@+id/check"
-        android:layout_width="wrap_content"
+    <Spinner
+        android:layout_width="50sp"
         android:layout_height="wrap_content"
+        android:id="@+id/spinner"
+        android:entries="@array/good_check"
+        android:spinnerMode="dialog"
+        android:layout_toEndOf="@+id/label"
         android:focusable="false"
-        android:layout_below="@+id/location"
-        android:layout_centerHorizontal="true">
-    </CheckBox>
+        android:gravity="right"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout> 

@@ -5,10 +5,13 @@ import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class InteractiveArrayAdapter extends ArrayAdapter<GoodModel> {
 
@@ -23,7 +26,7 @@ public class InteractiveArrayAdapter extends ArrayAdapter<GoodModel> {
 
     static class ViewHolder {
         protected TextView text;
-        protected CheckBox checkbox;
+        protected Spinner spinner;
     }
 
     @Override
@@ -34,28 +37,34 @@ public class InteractiveArrayAdapter extends ArrayAdapter<GoodModel> {
             view = inflator.inflate(R.layout.gooditem, null);
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.text = (TextView) view.findViewById(R.id.label);
-            viewHolder.checkbox = (CheckBox) view.findViewById(R.id.check);
-            viewHolder.checkbox
-                    .setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            viewHolder.spinner = (Spinner) view.findViewById(R.id.spinner);
 
-                        @Override
-                        public void onCheckedChanged(CompoundButton buttonView,
-                                                     boolean isChecked) {
-                            GoodModel element = (GoodModel) viewHolder.checkbox
-                                    .getTag();
-                            element.setSelected(buttonView.isChecked());
+            viewHolder.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view,
+                                           int pos, long id) {
+                    // An item was selected. You can retrieve the selected item using
+                    // parent.getItemAtPosition(pos)
+                    GoodModel element = (GoodModel) viewHolder.spinner.getTag();
+                    String strChoose = viewHolder.spinner.getSelectedItem().toString();
+                    Toast.makeText(getContext(), strChoose, Toast.LENGTH_SHORT).show();
+                    element.setSelected(pos);
+                }
 
-                        }
-                    });
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    // Another interface callback
+                }
+            });
             view.setTag(viewHolder);
-            viewHolder.checkbox.setTag(list.get(position));
+            viewHolder.spinner.setTag(list.get(position));
         } else {
             view = convertView;
-            ((ViewHolder) view.getTag()).checkbox.setTag(list.get(position));
+            ((ViewHolder) view.getTag()).spinner.setTag(list.get(position));
         }
         ViewHolder holder = (ViewHolder) view.getTag();
         holder.text.setText(list.get(position).getDescription());
-        holder.checkbox.setChecked(list.get(position).isSelected());
+        holder.spinner.setSelection(list.get(position).isSelected());
         return view;
     }
 }

@@ -114,7 +114,7 @@ public class GoodsActivity extends ListActivity {
                     String value = input.getText().toString();
                     // Получили значение введенных данных!
 
-                    list.add(new GoodModel(value));
+                    list.add(new GoodModel(value, GoodsActivity.this));
                     adapter.notifyDataSetChanged();
                 }
             });

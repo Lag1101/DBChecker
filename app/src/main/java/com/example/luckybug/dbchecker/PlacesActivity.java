@@ -205,7 +205,7 @@ public class PlacesActivity extends ListActivity implements
                 for( Model place : placesList.list) {
                     List<NameValuePair> goods = new ArrayList<NameValuePair>();
                     for( GoodModel good : place.getList()) {
-                        goods.add(new BasicNameValuePair(good.getDescription(), Boolean.toString(good.isSelected())));
+                        goods.add(new BasicNameValuePair(good.getDescription(), getResources().getStringArray(R.array.good_check)[good.isSelected()]));
                     }
                     places.add(new BasicNameValuePair(place.getName(), goods.toString()));
                 }

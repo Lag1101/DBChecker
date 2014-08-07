@@ -1,5 +1,7 @@
 package com.example.luckybug.dbchecker;
 
+import android.content.Context;
+
 import java.io.Serializable;
 
 /**
@@ -8,11 +10,11 @@ import java.io.Serializable;
 public class GoodModel implements Serializable {
 
     private String description;
-    private boolean selected;
+    private int selected;
 
-    public GoodModel(String description) {
+    public GoodModel(String description, Context context) {
         this.description = description;
-        selected = false;
+        selected = 0;
     }
 
     public String getDescription() {
@@ -23,11 +25,11 @@ public class GoodModel implements Serializable {
         this.description = description;
     }
 
-    public boolean isSelected() {
+    public int isSelected() {
         return selected;
     }
 
-    public void setSelected(boolean selected) {
+    public void setSelected(int selected) {
         this.selected = selected;
     }
 
