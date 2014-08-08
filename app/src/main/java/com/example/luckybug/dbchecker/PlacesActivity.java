@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,17 +30,73 @@ import java.util.Date;
 /**
  * Created by vasiliy.lomanov on 05.08.2014.
  */
-public class PlacesActivity extends ListActivity implements
-        GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener{
+public class PlacesActivity extends ListActivity {
 
 
     static final float eps = 1500;
 
-    LocationClient mLocationClient;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    Location mLocation;
 
     ArrayAdapter<Model> adapter;
     PlacesList placesList = new PlacesList();
+
+    private static final int TWO_MINUTES = 1000 * 60 * 2;
+
+    /** Determines whether one Location reading is better than the current Location fix
+     * @param location  The new Location that you want to evaluate
+     * @param currentBestLocation  The current Location fix, to which you want to compare the new one
+     */
+    protected boolean isBetterLocation(Location location, Location currentBestLocation) {
+        if (currentBestLocation == null) {
+            // A new location is always better than no location
+            return true;
+        }
+
+        // Check whether the new location fix is newer or older
+        long timeDelta = location.getTime() - currentBestLocation.getTime();
+        boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
+        boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
+        boolean isNewer = timeDelta > 0;
+
+        // If it's been more than two minutes since the current location, use the new location
+        // because the user has likely moved
+        if (isSignificantlyNewer) {
+            return true;
+            // If the new location is more than two minutes older, it must be worse
+        } else if (isSignificantlyOlder) {
+            return false;
+        }
+
+        // Check whether the new location fix is more or less accurate
+        int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
+        boolean isLessAccurate = accuracyDelta > 0;
+        boolean isMoreAccurate = accuracyDelta < 0;
+        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
+        // Check if the old and new location are from the same provider
+        boolean isFromSameProvider = isSameProvider(location.getProvider(),
+                currentBestLocation.getProvider());
+
+        // Determine location quality using a combination of timeliness and accuracy
+        if (isMoreAccurate) {
+            return true;
+        } else if (isNewer && !isLessAccurate) {
+            return true;
+        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+            return true;
+        }
+        return false;
+    }
+
+    /** Checks whether two providers are the same */
+    private boolean isSameProvider(String provider1, String provider2) {
+        if (provider1 == null) {
+            return provider2 == null;
+        }
+        return provider1.equals(provider2);
+    }
 
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -61,35 +119,42 @@ public class PlacesActivity extends ListActivity implements
             }
         });
 
-        mLocationClient = new LocationClient(this, this, this);
+        locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+                // Called when a new location is found by the network location provider.
+                //makeUseOfNewLocation(location);
+                if(isBetterLocation(location, mLocation))
+                    mLocation = location;
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            public void onProviderDisabled(String provider) {
+                startActivity(new Intent(
+                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+            }
+        };
+        mLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        // Connect the client.
-        mLocationClient.connect();
+    protected void onResume() {
+        super.onResume();
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                0, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER,
+                0, 0, locationListener);
     }
-    @Override
-    protected void onStop() {
-        // Disconnecting the client invalidates it.
-        mLocationClient.disconnect();
-        super.onStop();
-    }
-    @Override
-    public void onConnected(Bundle dataBundle) {
-        // Display the connection status
-        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
 
-    }
     @Override
-    public void onDisconnected() {
-        // Display the connection status
-        Toast.makeText(this, "Disconnected. Please re-connect.",
-                Toast.LENGTH_SHORT).show();
-    }
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    protected void onPause() {
+        super.onPause();
+        locationManager.removeUpdates(locationListener);
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -110,8 +175,7 @@ public class PlacesActivity extends ListActivity implements
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Model item = (Model) getListAdapter().getItem(position);
 
-        Location currentLocation = mLocationClient.getLastLocation();
-        float distance = currentLocation.distanceTo(item.getLocation());
+        float distance = mLocation.distanceTo(item.getLocation());
 
         Toast.makeText(this, "Distance to " + item.getName() + " is " + Float.toString(distance), Toast.LENGTH_LONG).show();
 
@@ -163,8 +227,7 @@ public class PlacesActivity extends ListActivity implements
                         String value = input.getText().toString();
                         // Получили значение введенных данных!
 
-                        Location currentLocation = mLocationClient.getLastLocation();
-                        placesList.list.add(new Model(value, currentLocation));
+                        placesList.list.add(new Model(value, mLocation));
                         adapter.notifyDataSetChanged();
                     }
                 });
