@@ -5,6 +5,7 @@ import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -16,7 +17,13 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by LuckyBug on 06.08.2014.
@@ -73,12 +80,9 @@ public class GoodsActivity extends ListActivity {
             case MENU_SHOW_PHOTO: {
                 if( clickedItem.getImage() != null ) {
 
-                    /*clickedItem.getImage().
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-
-                    intent.setData(URI.clickedItem.getImage());
-
-                    startActivity(intent);*/
+                    intent.setData(Uri.fromFile(new File(clickedItem.getImage())));
+                    startActivity(intent);
                 }
             }
         }
@@ -88,7 +92,24 @@ public class GoodsActivity extends ListActivity {
         if (requestCode == CAMERA_PIC_REQUEST && requestCode == RESULT_OK) {
             Bitmap photo = (Bitmap) data.getExtras().get("data");
 
-            list.get(longClickedItem).setImage(photo);
+            FileOutputStream out = null;
+            String filename = new Random().toString();
+            try {
+                out = new FileOutputStream(filename);
+                photo.compress(Bitmap.CompressFormat.PNG, 90, out);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (out != null) {
+                        out.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            list.get(longClickedItem).setImage(filename);
         }
     }
 

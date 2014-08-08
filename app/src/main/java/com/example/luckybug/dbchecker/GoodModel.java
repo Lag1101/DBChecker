@@ -13,7 +13,7 @@ import java.util.Arrays;
 public class GoodModel implements Serializable {
 
     private String description;
-    private Bitmap image = null;
+    private String imageName = null;
     private String check;
 
     public static ArrayList<GoodModel> defaultGoods = new ArrayList<GoodModel>(Arrays.asList(
@@ -45,12 +45,12 @@ public class GoodModel implements Serializable {
         this.check = check;
     }
 
-    public Bitmap getImage() {
-        return image;
+    public String getImage() {
+        return imageName;
     }
 
-    public void setImage(Bitmap image) {
-        this.image = image;
+    public void setImage(String imageName) {
+        this.imageName = imageName;
     }
 
 }
