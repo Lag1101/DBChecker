@@ -1,6 +1,7 @@
 package com.example.luckybug.dbchecker;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.Arrays;
 public class GoodModel implements Serializable {
 
     private String description;
+    private Bitmap image = null;
     private String check;
 
     public static ArrayList<GoodModel> defaultGoods = new ArrayList<GoodModel>(Arrays.asList(
@@ -41,6 +43,14 @@ public class GoodModel implements Serializable {
 
     public void setCheck(String check) {
         this.check = check;
+    }
+
+    public Bitmap getImage() {
+        return image;
+    }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
     }
 
 }

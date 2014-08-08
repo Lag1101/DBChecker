@@ -24,9 +24,11 @@ import java.util.ArrayList;
 public class GoodsActivity extends ListActivity {
     ArrayAdapter<GoodModel> adapter;
     ArrayList<GoodModel> list;
+    int longClickedItem = 0;
 
     static final int MENU_TAKE_PHOTO = 0;
-    static final int CAMERA_PIC_REQUEST = 1;
+    static final int MENU_SHOW_PHOTO = 1;
+    static final int CAMERA_PIC_REQUEST = 2;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -46,6 +48,7 @@ public class GoodsActivity extends ListActivity {
         // TODO Auto-generated method stub
         int position = ((AdapterView.AdapterContextMenuInfo)menuInfo).position;
         Toast.makeText(this, "Longclicked on position " + position, Toast.LENGTH_SHORT).show();
+        longClickedItem = position;
         switch (v.getId()) {
             default:
                 menu.add(0, MENU_TAKE_PHOTO, 0, "Take photo");
@@ -54,6 +57,9 @@ public class GoodsActivity extends ListActivity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         // TODO Auto-generated method stub
+
+        GoodModel clickedItem = list.get(longClickedItem);
+
         switch (item.getItemId()) {
             // пункты меню для tvColor
             case MENU_TAKE_PHOTO: {
@@ -64,13 +70,25 @@ public class GoodsActivity extends ListActivity {
 
                 break;
             }
+            case MENU_SHOW_PHOTO: {
+                if( clickedItem.getImage() != null ) {
+
+                    /*clickedItem.getImage().
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+
+                    intent.setData(URI.clickedItem.getImage());
+
+                    startActivity(intent);*/
+                }
+            }
         }
         return super.onContextItemSelected(item);
     }
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CAMERA_PIC_REQUEST && requestCode == RESULT_OK) {
-            Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-            Toast.makeText(this, "Took", Toast.LENGTH_SHORT).show();
+            Bitmap photo = (Bitmap) data.getExtras().get("data");
+
+            list.get(longClickedItem).setImage(photo);
         }
     }
 
