@@ -145,9 +145,9 @@ public class PlacesActivity extends ListActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                0, 0, locationListener);
         locationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER,
+                0, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                 0, 0, locationListener);
     }
 
